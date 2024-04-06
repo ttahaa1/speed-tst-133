@@ -2,4 +2,4 @@ certifi
 pyrogram
 telebot
 asyncio
-
+TgCrypto
