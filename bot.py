@@ -5,11 +5,11 @@ import telebot
 import threading
 from telebot import types
 import asyncio
-from backend import app
+from backend import App
 from db import database
 
 DB = database()
-App = app()
+App = App()
 os.environ['SSL_CERT_FILE'] = certifi.where()
 api_id = Config.APP_ID
 api_hash = Config.API_HASH
@@ -26,7 +26,7 @@ def Admin(message):
 
 اختار ما تريد من الازار اسفل 🔥
 يمكنك نقل اعضاء لجروبك 🛎
-من اي جروب اخر عام  ☄
+من اي جروب اخر عام  ☄
 
 Creator : @UI_XB *""", reply_markup=inline, parse_mode="markdown")
 
@@ -52,25 +52,22 @@ def statement(message):
                            parse_mode="markdown")
     bot.register_next_step_handler(msg, statement2, Fromgrob)
 
-def statement2(message, Fromgrob):
+async def statement2(message, Fromgrob):
     Ingrob = message.text
-    msg = bot.send_message(chat_id=message.chat.id, text="*انتظر قليلا ⏱*", parse_mode="markdown")
-    T = threading.Thread(target=asyncio.run, args=(App.GETuser(Fromgrob, Ingrob),))
-    T.start()
-    T.join()
-    list_users = T.result()
+    await bot.send_message(message.chat.id, "*انتظر قليلا ⏱*", parse_mode="markdown")
+    list_users = await App.GETuser(Fromgrob, Ingrob)
     numUser = len(list_users)
-    bot.send_message(message.chat.id, f"""*تم حفظ جميع الاعضاء المتاحه بنجاح *✅
+    await bot.send_message(message.chat.id, f"""*تم حفظ جميع الاعضاء المتاحة بنجاح *✅
 
 *معلومات عملية النقل 🥸😇
 
- الاعضاء المتاحه : {numUser} عضو 😋
+ الاعضاء المتاحة : {numUser} عضو 😋
 النقل من  : {Fromgrob} 🎒
 النقل الي : {Ingrob} 🧳
-مده الفحص : 1 ثانية ⏱
+مدة الفحص : 1 ثانية ⏱
 
 انتظر الي ان تتم العملية 🎩* """, parse_mode="markdown")
-    T = threading.Thread(target=asyncio.run, args=(App.ADDuser(list_users, Ingrob, message.chat.id, bot),))
+    await App.ADDuser(list_users, Ingrob, message.chat.id, bot)
     T.start()
 
 def AddAccount(message):
