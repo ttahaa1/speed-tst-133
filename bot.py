@@ -1,7 +1,6 @@
 from config import Config
 import os
 import certifi
-from pyrogram import Client, errors
 import telebot
 import threading
 from telebot import types
@@ -27,25 +26,30 @@ def Admin(message):
 
 اختار ما تريد من الازار اسفل 🔥
 يمكنك نقل اعضاء لجروبك 🛎
-من اي جروب اخر عام  ☄
+من اي جروب اخر عام  ☄
 
 Creator : @UI_XB *""", reply_markup=inline, parse_mode="markdown")
 
-@bot.callback_query_handler(lambda call:True)
+@bot.callback_query_handler(lambda call: True)
 def call(call):
     if call.data == "Accounts":
         num = DB.accounts()
-        msg = bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=f"حساباتك المسجلة بلكامل : {num}", parse_mode="markdown")
+        msg = bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                     text=f"حساباتك المسجلة بلكامل : {num}", parse_mode="markdown")
     if call.data == "AddAccount":
-        msg = bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text="*قوم بارسال الرقم الذي تريد تسليمه مع رمز الدولة الان*📞🎩", parse_mode="markdown")
+        msg = bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                     text="*قوم بارسال الرقم الذي تريد تسليمه مع رمز الدولة الان*📞🎩",
+                                     parse_mode="markdown")
         bot.register_next_step_handler(msg, AddAccount)
     if call.data == "a1":
-        msg = bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text="*قوم بارسال رابط الجروب المراد النقل منه *🖲", parse_mode="markdown")
+        msg = bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                     text="*قوم بارسال رابط الجروب المراد النقل منه *🖲", parse_mode="markdown")
         bot.register_next_step_handler(msg, statement)
 
 def statement(message):
     Fromgrob = message.text
-    msg = bot.send_message(chat_id=message.chat.id, text="*قوم بارسال رابط الجروب المراد النقل له*🛎", parse_mode="markdown")
+    msg = bot.send_message(chat_id=message.chat.id, text="*قوم بارسال رابط الجروب المراد النقل له*🛎",
+                           parse_mode="markdown")
     bot.register_next_step_handler(msg, statement2, Fromgrob)
 
 def statement2(message, Fromgrob):
@@ -54,7 +58,8 @@ def statement2(message, Fromgrob):
     T = threading.Thread(target=asyncio.run, args=(App.GETuser(Fromgrob, Ingrob),))
     T.start()
     T.join()
-    numUser = len(T.return_value)
+    list_users = T.result()
+    numUser = len(list_users)
     bot.send_message(message.chat.id, f"""*تم حفظ جميع الاعضاء المتاحه بنجاح *✅
 
 *معلومات عملية النقل 🥸😇
@@ -65,7 +70,7 @@ def statement2(message, Fromgrob):
 مده الفحص : 1 ثانية ⏱
 
 انتظر الي ان تتم العملية 🎩* """, parse_mode="markdown")
-    T = threading.Thread(target=asyncio.run, args=(App.ADDuser(T.return_value, Ingrob, message.chat.id, bot),))
+    T = threading.Thread(target=asyncio.run, args=(App.ADDuser(list_users, Ingrob, message.chat.id, bot),))
     T.start()
 
 def AddAccount(message):
@@ -80,7 +85,7 @@ def AddAccount(message):
         else:
             Mas = bot.send_message(message.chat.id, "*انتظر جاري الفحص* ⏱")
     except Exception as e:
-        bot.send_message(message.chat.id, "ERORR : " + str(e))
+        bot.send_message(message.chat.id, f"ERORR : {e}")
 
 def sigin_up(message, _client, phone, hash, name):
     try:
@@ -109,6 +114,6 @@ def AddPassword(message, _client, name):
             _client.stop()
         except:
             pass
-        bot.send_message(message.chat.id, f"ERORR : {e}")
+        bot.send_message(message.chat.id, f"ERORR : {e} ")
 
 bot.infinity_polling(none_stop=True, timeout=15, long_polling_timeout=15)
